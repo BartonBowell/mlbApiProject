@@ -160,24 +160,28 @@ def batter_stats(stats):
     Returns:
         list: A list of strings representing the batting statistics.
     """
-    stats_list = [
-    "Batting Stats:",
-    f"  AVG: {stats['stats'][0]['splits'][0]['stat']['avg']}",
-    f"  OBP: {stats['stats'][0]['splits'][0]['stat']['obp']}",
-    f"  SLG: {stats['stats'][0]['splits'][0]['stat']['slg']}",
-    f"  OPS: {stats['stats'][0]['splits'][0]['stat']['ops']}",
-    f"  Doubles: {stats['stats'][0]['splits'][0]['stat']['doubles']}",
-    f"  Triples: {stats['stats'][0]['splits'][0]['stat']['triples']}",
-    f"  Home Runs: {stats['stats'][0]['splits'][0]['stat']['homeRuns']}",
-    f"  RBI: {stats['stats'][0]['splits'][0]['stat']['rbi']}",
-    f"  BABIP: {stats['stats'][0]['splits'][0]['stat']['babip']}",
-    f"  AB/HR: {stats['stats'][0]['splits'][0]['stat']['atBatsPerHomeRun']}",
-    f"  GIDP: {stats['stats'][0]['splits'][0]['stat']['groundIntoDoublePlay']}",
-    f"  PA: {stats['stats'][0]['splits'][0]['stat']['plateAppearances']}",
-    f"  SB: {stats['stats'][0]['splits'][0]['stat']['stolenBases']}",
-    f"  Walks: {stats['stats'][0]['splits'][0]['stat']['baseOnBalls']}"
-    ]
-    return stats_list
+    if stats == {}:
+        print("No Stats Found")
+        main()
+    else:
+        stats_list = [
+        "Batting Stats:",
+        f"  AVG: {stats['stats'][0]['splits'][0]['stat']['avg']}",
+        f"  OBP: {stats['stats'][0]['splits'][0]['stat']['obp']}",
+        f"  SLG: {stats['stats'][0]['splits'][0]['stat']['slg']}",
+        f"  OPS: {stats['stats'][0]['splits'][0]['stat']['ops']}",
+        f"  Doubles: {stats['stats'][0]['splits'][0]['stat']['doubles']}",
+        f"  Triples: {stats['stats'][0]['splits'][0]['stat']['triples']}",
+        f"  Home Runs: {stats['stats'][0]['splits'][0]['stat']['homeRuns']}",
+        f"  RBI: {stats['stats'][0]['splits'][0]['stat']['rbi']}",
+        f"  BABIP: {stats['stats'][0]['splits'][0]['stat']['babip']}",
+        f"  AB/HR: {stats['stats'][0]['splits'][0]['stat']['atBatsPerHomeRun']}",
+        f"  GIDP: {stats['stats'][0]['splits'][0]['stat']['groundIntoDoublePlay']}",
+        f"  PA: {stats['stats'][0]['splits'][0]['stat']['plateAppearances']}",
+        f"  SB: {stats['stats'][0]['splits'][0]['stat']['stolenBases']}",
+        f"  Walks: {stats['stats'][0]['splits'][0]['stat']['baseOnBalls']}"
+        ]
+        return stats_list
 
 def search_batter(player, year):
     """
@@ -230,6 +234,23 @@ def get_stat_leader(category, year, type):
     return [stat_leaders, stat_leaders_name]
         
         
+def get_box_score(homeTeam,awayTeam,year):
+    games = statsapi.schedule(start_date='03/28/'+year,end_date='12/31/'+year,team=teamNameList[homeTeam],opponent=teamNameList[awayTeam])
+    game_ids = []
+    game_data = []
+    for game in games:
+            game_ids.append(game['game_id'])
+            game_data.append(game['game_date'])
+
+    print('There are',len(game_ids),'games between the',homeTeam,'and the',awayTeam,'in',year,
+          '\nWhich game would you like to see the box score for?')
+    for i in range(0,len(game_ids)):
+        print(i,':',game_data[i])
+    input_game = int(input())
+    box_score = statsapi.boxscore(game_ids[input_game])
+
+    return box_score
+
 
 
 def main():
@@ -242,13 +263,19 @@ def main():
     - Compare: Compare stats between players.
     - Leader: Display leader in a specific category.
     """
+    #get_box_score('yankees','red sox','2021')
+    standings = statsapi.get('standings',{'leagueId':103,'season':2021,'hydrate':'team'})
+    jobs = statsapi.get('jobs',{'jobType':'OWNR'})
+
     print('Which Command Would you like to use?')
-    print("Search: Search for a player's stats.\nRoster: Display opening day roster for a team.\nCompare: Compare stats between players.\nLeader: Display leader in a specific category.")
+    print("Search: Search for a player's stats.\nRoster: Display opening day roster for a team.\nCompare: Compare stats between players.\nLeader: Display leader in a specific category.\nBox Score: Display box score for a game.")
     command = input()
     if command.lower() == 'search':
         player_name = input("Input Player First, Middle, or Last Name of any player currently on the 40-man Roster: ")
         year = input("Which Season: ")
         stats_list = search(player_name, year)
+        if stats_list == None:
+            main()
         print(stats_list[1],"Stats:")
         print('\n'.join(stats_list[0]))
         main()
@@ -273,6 +300,15 @@ def main():
         for i in range(0,10):
             print(f'{name[i]}: {stat[i]}')
         
+        main()
+    elif command.lower() == 'box score':
+        homeTeam = input('Home Team: ')
+        awayTeam = input('Away Team: ')
+        year = input('Which Season: ')
+        print(get_box_score(homeTeam,awayTeam,year))
+        main()
+    else:
+        print('Invalid Command')
         main()
 
 if __name__ == "__main__":

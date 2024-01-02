@@ -216,11 +216,16 @@ def get_stat_leader(category, year, type):
     Returns:
     None
     """
+    data = [{"assists":"assists"},{"shutouts":"shutouts"},{"homeruns":"homeRuns"},{"sacbunts":"sacrificeBunts"},{"sacfly":"sacrificeFlies"},{"runs":"runs"},{"stolenbases":"stolenBases"},{"avg":"battingAverage"},{"groundouts":"groundOuts"},{"pitchcount":"numberOfPitches"},{"obp":"onBasePercentage"},{"cs":"caughtStealing"},{"gidp":"groundIntoDoublePlays"},{"totalbases":"totalBases"},{"era":"earnedRunAverage"},{"f%":"fieldingPercentage"},{"whip":"walksAndHitsPerInningPitched"},{"flyouts":"flyouts"},{"hbp":"hitByPitches"},{"gamesplayed":"gamesPlayed"},{"walks":"walks"},{"slg":"sluggingPercentage"},{"ops":"onBasePlusSlugging"},{"rbi":"runsBattedIn"},{"triples":"triples"},{"xbh":"extraBaseHits"},{"hits":"hits"},{"ab":"atBats"},{"ks":"strikeouts"},{"doubles":"doubles"},{"pa":"totalPlateAppearances"},{"ibb":"intentionalWalks"},{"w":"wins"},{"l":"losses"},{"sv":"saves"},{"wildpitches":"wildPitch"},{"airouts":"airOuts"},{"balks":"balk"},{"blownsaves":"blownSaves"},{"cera":"catcherEarnedRunAverage"},{"catchersinterference":"catchersInterference"},{"chances":"chances"},{"cg":"completeGames"},{"doubleplays":"doublePlays"},{"er":"earnedRun"},{"errors":"errors"},{"gamesfinished":"gamesFinished"},{"gamesstarted":"gamesStarted"},{"battershit":"hitbatters"},{"h/9":"hitsPer9Inn"},{"holds":"holds"},{"innings":"innings"},{"ip":"inningsPitched"},{"outfieldassists":"outfieldAssists"},{"passedballs":"passedBalls"},{"pickoffs":"pickoffs"},{"p/9":"pitchesPerInning"},{"putouts":"putOuts"},{"rangefactorpergame":"rangeFactorPerGame"},{"rf/9":"rangeFactorPer9Inn"},{"saveopp":"saveOpportunities"},{"sb%":"stolenBasePercentage"},{"k/9":"strikeoutsPer9Inn"},{"k/bb":"strikeoutWalkRatio"},{"throwingerror":"throwingErrors"},{"battersfaced":"totalBattersFaced"},{"tripleplays":"triplePlays"},{"bb/9":"walksPer9Inn"},{"win%":"winPercentage"}]
+    data_dict = {list(d.keys())[0]: list(d.values())[0] for d in data}
 
+    if category not in data_dict:
+        print('Invalid Category')
+        main()
     stat_leaders = []
     stat_leaders_name = []
     response = statsapi.get('stats_leaders', {
-        'leaderCategories': category,
+        'leaderCategories': data_dict[str(category)],
         'hydrate': type,
         'sportId': 1,
         'season': year,
@@ -230,11 +235,14 @@ def get_stat_leader(category, year, type):
         inc = ("{:02d}".format(i))
         stat_leaders.append(response['leagueLeaders'][0]['leaders'][int(inc)]['value'])
         stat_leaders_name.append(response['leagueLeaders'][0]['leaders'][int(inc)]['person']['fullName'])
-
-    return [stat_leaders, stat_leaders_name]
+    stat = response['leagueLeaders'][0]['leaderCategory']
+    return [stat_leaders, stat_leaders_name,stat]
         
         
 def get_box_score(homeTeam,awayTeam,year):
+    if homeTeam not in teamNameList or awayTeam not in teamNameList:
+        print('Invalid Team')
+        main()
     games = statsapi.schedule(start_date='03/28/'+year,end_date='12/31/'+year,team=teamNameList[homeTeam],opponent=teamNameList[awayTeam])
     game_ids = []
     game_data = []
@@ -250,6 +258,42 @@ def get_box_score(homeTeam,awayTeam,year):
     box_score = statsapi.boxscore(game_ids[input_game])
 
     return box_score
+
+
+#FIX THIS, DOESNT ALWAYS RETURN PROPER SEASON
+
+def matchup(playerId, opposingPlayerId, year):
+    playerOne = statsapi.lookup_player(playerId[0], season=year)
+    playerTwo = statsapi.lookup_player(opposingPlayerId[0], season=year)
+    stats = statsapi.get('people', {'personIds': playerOne[0]['id'], 'season': year, 'hydrate': f'stats(group=[hitting,pitching],type=[vsPlayer],opposingPlayerId={playerTwo[0]['id']},season={year})'})['people'][0]
+    for i in range(0, 3):
+        for j in range(0, len(stats['stats'][i]['splits'])):
+            if stats['stats'][i]['type']['displayName'] == 'vsPlayer' and stats['stats'][i]['splits'][j]['season']==year:
+                if stats['stats'][i]['group']['displayName']=='hitting':
+                    print(f"{playerOne[0]['fullFMLName']} vs {playerTwo[0]['fullFMLName']} Stats:")
+                    print(f"  AVG: {stats['stats'][i]['splits'][0]['stat']['avg']}")
+                    print(f"  OBP: {stats['stats'][i]['splits'][0]['stat']['obp']}")
+                    print(f"  SLG: {stats['stats'][i]['splits'][0]['stat']['slg']}")
+                    print(f"  OPS: {stats['stats'][i]['splits'][0]['stat']['ops']}")
+                    print(f"  Doubles: {stats['stats'][i]['splits'][0]['stat']['doubles']}")
+                    print(f"  Triples: {stats['stats'][i]['splits'][0]['stat']['triples']}")
+                    print(f"  Home Runs: {stats['stats'][i]['splits'][0]['stat']['homeRuns']}")
+                    print(f"  RBI: {stats['stats'][i]['splits'][0]['stat']['rbi']}")
+                    print(f"  BABIP: {stats['stats'][i]['splits'][0]['stat']['babip']}")
+                    print(f"  AB/HR: {stats['stats'][i]['splits'][0]['stat']['atBatsPerHomeRun']}")
+                    print(f"  GIDP: {stats['stats'][i]['splits'][0]['stat']['groundIntoDoublePlay']}")
+                    print(f"  PA: {stats['stats'][i]['splits'][0]['stat']['plateAppearances']}")
+                    print(f"  Walks: {stats['stats'][i]['splits'][0]['stat']['baseOnBalls']}")
+                elif stats['stats'][i]['group']['displayName']=='pitching':
+                    print(f"{playerOne[0]['fullFMLName']} vs {playerTwo[0]['fullFMLName']} Stats:")
+                    print(f"  Runs Allowed: {stats['stats'][i]['splits'][0]['stat']['rbi']}")
+                    print(f"  WHIP: {stats['stats'][i]['splits'][0]['stat']['whip']}")
+                    print(f"  Games Played: {stats['stats'][i]['splits'][0]['stat']['gamesPitched']}")
+                    print(f"  HR Allowed: {stats['stats'][i]['splits'][0]['stat']['homeRuns']}")
+                    print(f"  Walks: {stats['stats'][i]['splits'][0]['stat']['baseOnBalls']}")
+                    print(f"  Hits: {stats['stats'][i]['splits'][0]['stat']['hits']}")
+                    print(f"  AVG: {stats['stats'][i]['splits'][0]['stat']['avg']}")
+
 
 
 
@@ -268,7 +312,7 @@ def main():
     jobs = statsapi.get('jobs',{'jobType':'OWNR'})
 
     print('Which Command Would you like to use?')
-    print("Search: Search for a player's stats.\nRoster: Display opening day roster for a team.\nCompare: Compare stats between players.\nLeader: Display leader in a specific category.\nBox Score: Display box score for a game.")
+    print("Search: Search for a player's stats.\nRoster: Display opening day roster for a team.\nCompare: Compare stats between players.\nLeader: Display leader in a specific category.\nBox Score: Display box score for a game.\nMatchup: Display stats for a player against another player.")
     command = input()
     if command.lower() == 'search':
         player_name = input("Input Player First, Middle, or Last Name of any player currently on the 40-man Roster: ")
@@ -297,6 +341,8 @@ def main():
         response = get_stat_leader(category, year, type)
         name = response[1]
         stat = response[0]
+        stat_cat = response[2]
+        print(f'The {str(stat_cat).upper()} leaders for {year} are:')
         for i in range(0,10):
             print(f'{name[i]}: {stat[i]}')
         
@@ -306,6 +352,13 @@ def main():
         awayTeam = input('Away Team: ')
         year = input('Which Season: ')
         print(get_box_score(homeTeam,awayTeam,year))
+        main()
+    elif command.lower() == 'matchup':
+        year = input('Which Season: ')
+        playerId = (input('Player One: '), year)
+        opposingPlayerId = (input('Player Two: '), year)
+        #type = input('Which Type Player or Team.: ')
+        matchup(playerId, opposingPlayerId, year)
         main()
     else:
         print('Invalid Command')

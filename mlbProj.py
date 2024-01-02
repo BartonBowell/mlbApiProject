@@ -71,6 +71,50 @@ def print_opening_day_roster(team_id, year):
     print()
     main()
 
+def get_qualified_starters(team_id, year):
+    """
+    Retrieves the pitching staff for a given team ID and year.
+
+    Parameters:
+    team_id (int): The ID of the team.
+    year (int): The year of the season.
+
+    Returns:
+    pitching_staff (list): A list of dictionaries containing the pitching staff.
+    """
+    i=0
+    pitching_staff = statsapi.get('team_roster', {'teamId': team_id, 'season': year, 'rosterType': 'active', 'fields': 'person'})['roster']
+    qualified_pitching_staff = {}
+    for player in pitching_staff:
+        i+=1
+        inc = ("{:02d}".format(i))
+        if player['position']['abbreviation'] == 'P':
+            pitcher = search(player['person']['fullName'],year)
+            if player['status']['code']=='A':
+            #Nesting this to reduce api calls
+                if  is_qualified(player['person']['id'], year) == True:
+                    print(pitcher[1],'\n'.join(pitcher[0]))
+                    qualified_pitching_staff[pitcher[1]] = pitcher[0]
+            
+    return qualified_pitching_staff
+
+def is_qualified(player_id, year):
+    """
+    Determines whether a player is qualified based on their stats.
+
+    Parameters:
+    stats (dict): A dictionary containing the player's statistics.
+
+    Returns:
+    bool: True if the player is qualified, False otherwise.
+    """
+    stats = statsapi.get('people', {'personIds': player_id, 'season': year, 'hydrate': f'stats(group=[pitching],type=season,season={year})'})['people'][0]
+
+    if float(stats['stats'][0]['splits'][0]['stat']['inningsPitched'])/162 >= 1:
+        return True
+    else:
+        return False
+
 def search(player_name, year):
     """
     Search for a player's statistics based on their name and the specified year.
@@ -298,6 +342,7 @@ def matchup(playerId, opposingPlayerId, year):
 
 
 def main():
+    
     """
     Main function that prompts the user to choose a command and performs the corresponding action.
 
@@ -308,6 +353,7 @@ def main():
     - Leader: Display leader in a specific category.
     """
     #get_box_score('yankees','red sox','2021')
+    #(get_qualified_starters(teamNameList['mariners'], 2023))
     standings = statsapi.get('standings',{'leagueId':103,'season':2021,'hydrate':'team'})
     jobs = statsapi.get('jobs',{'jobType':'OWNR'})
 
@@ -359,6 +405,12 @@ def main():
         opposingPlayerId = (input('Player Two: '), year)
         #type = input('Which Type Player or Team.: ')
         matchup(playerId, opposingPlayerId, year)
+        main()
+    #This command needs work, takes too long 
+    elif command.lower() == 'qualified starters':
+        team = input('Which Team: ')
+        year = input('Which Season: ')
+        starters = get_qualified_starters(teamNameList[team], year)
         main()
     else:
         print('Invalid Command')

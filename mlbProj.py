@@ -65,7 +65,7 @@ def print_opening_day_roster(team_id, year):
     None
     """
     datePog = statsapi.get('season', {'seasonId': int(year), 'sportId': 1})
-    roster = statsapi.roster(team_id, 'active', date=statsapi.get('season', {'seasonId': int(year), 'sportId': 1})['seasons'][0]['seasonStartDate'])
+    roster = statsapi.roster(team_id,  season=year)
     print(f"Opening Day Roster for Team ID {team_id} in {year}:")
     print(roster)
     print()
@@ -326,8 +326,8 @@ def main():
     elif command.lower() == 'roster':
         team = input("Input Team Name:\n").lower()
         year = input("Which Season:\n").lower()
-        main()
         roster(team,year)
+        main()
     elif command.lower() == 'compare':
         playerOne = input('Input Player One: ')
         playerTwo = input('Input Player Two: ')

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>Enter Team and Year:</h1>
+
+<form method="POST">
+  <label for="team">Team:</label><br>
+  <input type="text" id="team" name="team"><br>
+  <label for="year">Year:</label><br>
+  <input type="text" id="year" name="year"><br>
+  <input type="submit" value="Submit">
+</form>
+
+<h1>Roster:</h1>
+<ul>
+{% for player in roster %}
+  <li>{{ player }}</li>
+{% endfor %}
+</ul>
+
+</body>
+</html>

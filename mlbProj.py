@@ -303,12 +303,33 @@ def get_box_score(homeTeam,awayTeam,year):
 
     return box_score
 
+def get_transactions(player):
+    """
+    Retrieves the transactions for a given player.
 
+    Parameters:
+    player (dict): A dictionary containing player information.
+
+    Returns:
+    None
+    """
+
+    player_data = statsapi.lookup_player(player, season='2023')[0]['id']
+    stats = statsapi.get('people', {'personIds': player_data, 'season': 2023, 'hydrate': 'transactions'})
+   #Add logic to loop through transactions and print them if the from team and to team are in name list
+    transactions = statsapi.get('people', {'personIds': player_data, 'hydrate': 'transactions'})['people'][0]['transactions']
+    for transaction in transactions:
+        if transaction['typeCode'] == 'SFA' or transaction['typeCode'] == 'DFA' or transaction['typeCode'] == 'TR':
+            print(transaction['description'])
+    main()
 #FIX THIS, DOESNT ALWAYS RETURN PROPER SEASON
 
-def matchup(playerId, opposingPlayerId, year):
-    playerOne = statsapi.lookup_player(playerId[0], season=year)
-    playerTwo = statsapi.lookup_player(opposingPlayerId[0], season=year)
+def matchup(player, opposing_player, year):
+    playerOne = statsapi.lookup_player(player[0], season=year)
+    playerTwo = statsapi.lookup_player(opposing_player[0], season=year)
+    if playerOne == [] or playerTwo == []:
+        print('Player Not Found')
+        main()
     stats = statsapi.get('people', {'personIds': playerOne[0]['id'], 'season': year, 'hydrate': f'stats(group=[hitting,pitching],type=[vsPlayer],opposingPlayerId={playerTwo[0]['id']},season={year})'})['people'][0]
     for i in range(0, 3):
         for j in range(0, len(stats['stats'][i]['splits'])):
@@ -354,8 +375,9 @@ def main():
     """
     #get_box_score('yankees','red sox','2021')
     #(get_qualified_starters(teamNameList['mariners'], 2023))
-    standings = statsapi.get('standings',{'leagueId':103,'season':2021,'hydrate':'team'})
-    jobs = statsapi.get('jobs',{'jobType':'OWNR'})
+    #standings = statsapi.get('standings',{'leagueId':103,'season':2021,'hydrate':'team'})
+    #get_transactions('rich hill')
+    
 
     print('Which Command Would you like to use?')
     print("Search: Search for a player's stats.\nRoster: Display opening day roster for a team.\nCompare: Compare stats between players.\nLeader: Display leader in a specific category.\nBox Score: Display box score for a game.\nMatchup: Display stats for a player against another player.")
@@ -401,16 +423,20 @@ def main():
         main()
     elif command.lower() == 'matchup':
         year = input('Which Season: ')
-        playerId = (input('Player One: '), year)
-        opposingPlayerId = (input('Player Two: '), year)
+        player = (input('Player One: '), year)
+        opposing_player = (input('Player Two: '), year)
         #type = input('Which Type Player or Team.: ')
-        matchup(playerId, opposingPlayerId, year)
+        matchup(player, opposing_player, year)
         main()
     #This command needs work, takes too long 
     elif command.lower() == 'qualified starters':
         team = input('Which Team: ')
         year = input('Which Season: ')
         starters = get_qualified_starters(teamNameList[team], year)
+        main()
+    elif command.lower() == 'transactions':
+        player = input('Which Player: ')
+        get_transactions(player)
         main()
     else:
         print('Invalid Command')

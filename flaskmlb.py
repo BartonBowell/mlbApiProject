@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-import mlbapi
+import mlbProj
 
 app = Flask(__name__)
 
@@ -8,7 +8,7 @@ def roster():
     if request.method == 'POST':
         team = request.form.get('team').lower()
         year = int(request.form.get('year'))
-        roster = mlbapi.roster(team, year).split('\n')
+        roster = mlbProj.roster(team, year).split('\n')
         print(roster)
         print(type(roster))
     else:
@@ -21,7 +21,7 @@ def search():
     if request.method == 'POST':
         player = request.form.get('player')
         year = int(request.form.get('year'))
-        player_stats = mlbapi.search(player, year)
+        player_stats = mlbProj.search(player, year)
         
         print(player_stats)
         print(type(player_stats))

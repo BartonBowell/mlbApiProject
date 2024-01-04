@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+
+<h1>Enter player and Year:</h1>
+
+<form method="POST">
+  <label for="player">player:</label><br>
+  <input type="text" id="player" name="player"><br>
+  <label for="year">Year:</label><br>
+  <input type="text" id="year" name="year"><br>
+  <input type="submit" value="Submit">
+</form>
+
+<h1>Player Stats:</h1>
+
+<ul>
+{% for stat in search %}
+  <li>{{ stat }}</li>
+{% endfor %}
+</ul>
+
+</body>
+</html>

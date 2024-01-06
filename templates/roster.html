@@ -11,11 +11,43 @@
 <form class="w3-container" method="POST">
   <div class="w3-half">
   <h2 class="w3-center" for="team">Team</label><br>
-  <input class="w3-input w3-block" type="text" id="team" name="team"><br>
+  <input class="w3-input w3-border" list="suggestions" type="text" id="team" name="team"><br>
+  <datalist id="suggestions">
+    <option value="Angels">Angels</option>
+    <option value="Astros">Astros</option>
+    <option value="Athletics">Athletics</option>
+    <option value="Blue Jays">Blue Jays</option>
+    <option value="Braves">Braves</option>
+    <option value="Brewers">Brewers</option>
+    <option value="Cardinals">Cardinals</option>
+    <option value="Cubs">Cubs</option>
+    <option value="Diamondbacks">Diamondbacks</option>
+    <option value="Dodgers">Dodgers</option>
+    <option value="Giants">Giants</option>
+    <option value="Indians">Indians</option>
+    <option value="Mariners">Mariners</option>
+    <option value="Marlins">Marlins</option>
+    <option value="Mets">Mets</option>
+    <option value="Nationals">Nationals</option>
+    <option value="Orioles">Orioles</option>
+    <option value="Padres">Padres</option>
+    <option value="Phillies">Phillies</option>
+    <option value="Pirates">Pirates</option>
+    <option value="Rangers">Rangers</option>
+    <option value="Rays">Rays</option>
+    <option value="Red Sox">Red Sox</option>
+    <option value="Reds">Reds</option>
+    <option value="Rockies">Rockies</option>
+    <option value="Royals">Royals</option>
+    <option value="Tigers">Tigers</option>
+    <option value="Twins">Twins</option>
+    <option value="White Sox">White Sox</option>
+    <option value="Yankees">Yankees</option>
+</datalist>
   </div>  
   <div class="w3-half">
   <h2 class="w3-center" for="year">Year</label><br>
-  <input class="w3-input w3-block" type="text" id="year" name="year"><br>
+  <input class="w3-input w3-border" type="text" id="year" name="year"><br>
   </div>  
   <input class="w3-button w3-teal w3-block" type="submit" value="Submit">
 </form>

@@ -11,8 +11,8 @@
 <form class="w3-container" method="POST">
   <div class="w3-half">
   <h2 class="w3-center" for="stat">Stat</label><br>
-  <label for="stat">Stat</label>
-  <select name= stat method="GET" action="/">
+  <input class="w3-input w3-border" list="suggestions" type="text" id="year" name="year"><br>
+  <datalist id="suggestions">
     <option value="airOuts">Air Outs</option>
     <option value="assists">Assists</option>
     <option value="atBats">AB</option>
@@ -81,11 +81,11 @@
     <option value="wildPitch">Wild Pitches</option>
     <option value="wins">Wins</option>
     <option value="winPercentage">Win %</option>
-</select>
+  </datalist>
   </div>  
   <div class="w3-half">
   <h2 class="w3-center" for="year">Year</label><br>
-  <input class="w3-input w3-block" type="text" id="year" name="year"><br>
+  <input class="w3-input w3-border" type="text" id="year" name="year"><br>
   </div>  
   <input class="w3-button w3-teal w3-block" type="submit" value="Submit">
 </form>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body>
+<div class="w3-container">
+<a href="/" class="w3-button">Go Home</a>
+
+
+<form class="w3-container" method="POST">
+  <div class="w3-half">
+  <h2 class="w3-center" for="stat">Stat</label><br>
+  <label for="stat">Stat</label>
+  <select name= stat method="GET" action="/">
+    <option value="airOuts">Air Outs</option>
+    <option value="assists">Assists</option>
+    <option value="atBats">AB</option>
+    <option value="balk">Balk</option>
+    <option value="battingAverage">AVG</option>
+    <option value="blownSaves">Blown Saves</option>
+    <option value="catcherEarnedRunAverage">Catcher ERA</option>
+    <option value="catchersInterference">Catchers Interference</option>
+    <option value="chances">Chances</option>
+    <option value="completeGames">Complete Games</option>
+    <option value="doublePlays">Double Plays</option>
+    <option value="doubles">Doubles</option>
+    <option value="earnedRun">Earned Runs</option>
+    <option value="earnedRunAverage">ERA</option>
+    <option value="errors">Errors</option>
+    <option value="extraBaseHits">xBA</option>
+    <option value="fieldingPercentage">Fielding %</option>
+    <option value="flyouts">Fly Outs</option>
+    <option value="gamesFinished">Games Finished</option>
+    <option value="gamesPlayed">Games Played</option>
+    <option value="gamesStarted">Games Started</option>
+    <option value="groundIntoDoublePlays">GIDP</option>
+    <option value="groundOuts">Ground Outs</option>
+    <option value="hitByPitches">HBP</option>
+    <option value="hitbatters">Hit Batters</option>
+    <option value="hits">Hits</option>
+    <option value="hitsPer9Inn">H/9</option>
+    <option value="holds">Holds</option>
+    <option value="homeruns">Home Runs</option>
+    <option value="innings">Innings</option>
+    <option value="inningsPitched">Innings Pitched</option>
+    <option value="intentionalWalks">IBB</option>
+    <option value="losses">Losses</option>
+    <option value="numberOfPitches">Number Of Pitches</option>
+    <option value="onBasePercentage">OBP</option>
+    <option value="onBasePlusSlugging">OPS</option>
+    <option value="outfieldAssists">Outfield Assists</option>
+    <option value="passedBalls">Passed Balls</option>
+    <option value="pickoffs">Pickoffs</option>
+    <option value="pitchesPerInning">Pitches/Inning</option>
+    <option value="putOuts">Put Outs</option>
+    <option value="rangeFactorPer9Inn">Range Factor Per Innings</option>
+    <option value="rangeFactorPerGame">Range Factor Per Game</option>
+    <option value="runs">Runs</option>
+    <option value="runsBattedIn">RBI</option>
+    <option value="sacrificeBunts">Sac Bunts</option>
+    <option value="sacrificeFlies">Sac Flys</option>
+    <option value="saveOpportunities">Save Opportunities</option>
+    <option value="saves">Saves</option>
+    <option value="shutouts">Shutouts</option>
+    <option value="sluggingPercentage">SLG</option>
+    <option value="stolenBasePercentage">Stolen Base %</option>
+    <option value="stolenBases">Stolen Bases</option>
+    <option value="strikeoutWalkRatio">K/BB</option>
+    <option value="strikeouts">Strikeouts</option>
+    <option value="strikeoutsPer9Inn">K/9</option>
+    <option value="totalBases">Total Bases</option>
+    <option value="totalBattersFaced">Total Batters Faced</option>
+    <option value="totalPlateAppearances">PA</option>
+    <option value="throwingErrors">Throwing Errors</option>
+    <option value="triples">Triples</option>
+    <option value="triplePlays">Triple Plays</option>
+    <option value="walks">Walks</option>
+    <option value="walksAndHitsPerInningPitched">WHIP</option>
+    <option value="walksPer9Inn">BB/9</option>
+    <option value="wildPitch">Wild Pitches</option>
+    <option value="wins">Wins</option>
+    <option value="winPercentage">Win %</option>
+</select>
+  </div>  
+  <div class="w3-half">
+  <h2 class="w3-center" for="year">Year</label><br>
+  <input class="w3-input w3-block" type="text" id="year" name="year"><br>
+  </div>  
+  <input class="w3-button w3-teal w3-block" type="submit" value="Submit">
+</form>
+
+
+<ul class="w3-ul"></ul>
+{% if stat_leader %}
+    <form class="w3-container" method="POST">
+    <div class="w3-half">
+{% for name in names %}
+    <li style="list-style: none; padding-right: 15px; font-size:30px; text-align: right;">{{ name }}</li>
+{% endfor %}
+</div>
+<div class="w3-half">
+{% for stat in stat_leader %}
+    <li style="list-style: none;padding-left: 15px; font-size:30px; text-align: left;">{{ stat }}</li>
+{% endfor %}
+</div>
+{% else %}
+    <p>No stat leader found.</p>
+{% endif %}
+</form>
+</ul>
+
+</div>
+</body>
+</html>

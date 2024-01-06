@@ -68,16 +68,21 @@ def search(player_name, year):
     Returns:
     None
     """
-    for player in statsapi.lookup_player(player_name, season=year):
+    stat_list = []
+    if player_name == '' or year == '':
+        return('Invalid Input')
+    players = statsapi.lookup_player(player_name, season=year)
+    if not players:
+        return [['No player found']]
+    for player in players:
         if player['primaryPosition']['abbreviation'] != 'P' and player['primaryPosition']['abbreviation'] != 'TWP':
-            stat_list = search_batter(player, year)
-            return stat_list
+            stat_list.append(search_batter(player, year))
         if player['primaryPosition']['abbreviation'] == 'TWP':
-            search_batter(player, year)
-            search_pitcher(player, year)
+            stat_list.append(search_batter(player, year))
+            stat_list.append(search_pitcher(player, year))
         elif player['primaryPosition']['abbreviation'] == 'P':
-            stat_list = search_pitcher(player, year)
-            return stat_list
+            stat_list.append(search_pitcher(player, year))
+    return stat_list
 
 def search_pitcher(player, year):
     """
@@ -114,7 +119,6 @@ def pitcher_stats(stats, i):
 
     """
     stats_list = [
-        "Pitching Stats:",
         f"  ERA: {stats['stats'][i]['splits'][0]['stat']['era']}",
         f"  WHIP: {stats['stats'][i]['splits'][0]['stat']['whip']}",
         f"  Win %: {stats['stats'][i]['splits'][0]['stat']['winPercentage']}",
@@ -135,6 +139,7 @@ def pitcher_stats(stats, i):
     ]
     return stats_list
 
+
 def batter_stats(stats):
     """
     Prints the batting statistics of a player.
@@ -149,7 +154,8 @@ def batter_stats(stats):
         print("No Stats Found")
     else:
         stats_list = [
-        "Batting Stats:",
+        f"  Position: {stats['primaryPosition']['name']}",
+        f"  Games: {stats['stats'][0]['splits'][0]['stat']['gamesPlayed']}",
         f"  AVG: {stats['stats'][0]['splits'][0]['stat']['avg']}",
         f"  OBP: {stats['stats'][0]['splits'][0]['stat']['obp']}",
         f"  SLG: {stats['stats'][0]['splits'][0]['stat']['slg']}",
@@ -222,22 +228,55 @@ def get_stat_leader(category, year, type):
     return [stat_leaders, stat_leaders_name,stat]
         
         
-def get_box_score(homeTeam,awayTeam,year):
-    if homeTeam not in teams or awayTeam not in teams:
-        print('Invalid Team')
-    games = statsapi.schedule(start_date='03/28/'+year,end_date='12/31/'+year,team=teams[homeTeam],opponent=teams[awayTeam])
+def get_game_id(team_one,team_two,date):
+    """
+    Retrieves the game IDs for a given team ID and year.
+
+    Parameters:
+    - team_id (int): The ID of the team.
+    - year (int): The year of the season.
+
+    Returns:
+    None
+    """
+    game_id = statsapi.schedule(date = date,team=teams[team_one],opponent=teams[team_two])
+    return [game_id]
+
+def get_game_ids(team_one,team_two,year):
+   
     game_ids = []
+    game_dates = []
+    if team_one != '' or team_two != '' or year != '':
+        games = statsapi.schedule(start_date = '5/20/'+str(year),end_date = '12/30/'+str(year),team=teams[team_one],opponent=teams[team_two])
+        for game in games:
+            game_ids.append(games[games.index(game)]['game_id'])
+            game_dates.append(games[games.index(game)]['game_date'])
+        return [game_ids,game_dates]
+    else:
+        return('Invalid Input')
+
+def get_game_data(team_one,team_two, year):
+    games = statsapi.schedule(start_date='03/28/'+year,end_date='12/31/'+year,team=teams[team_one],opponent=teams[team_two])
     game_data = []
     for game in games:
-            game_ids.append(game['game_id'])
-            game_data.append(game['game_date'])
+
+        game_data.append(game['game_date'])
+    return game_data
+
+'''def get_box_score(homeTeam,awayTeam,year):
+    if homeTeam not in teams or awayTeam not in teams:
+        return('Invalid Team')
+    game_ids = get_game_ids(homeTeam,awayTeam,year)
 
     print('There are',len(game_ids),'games between the',homeTeam,'and the',awayTeam,'in',year,
           '\nWhich game would you like to see the box score for?')
     for i in range(0,len(game_ids)):
-        print(i,':',game_data[i])
+        print(i,':',game_ids[1][i])
     input_game = int(input())
-    return statsapi.boxscore(game_ids[input_game])
+    box_score = statsapi.boxscore(game_ids[input_game])
+
+    return box_score'''
+
 
 
 
@@ -245,37 +284,41 @@ def get_box_score(homeTeam,awayTeam,year):
 #FIX THIS, DOESNT ALWAYS RETURN PROPER SEASON
 
 def matchup(playerId, opposingPlayerId, year):
-    playerOne = statsapi.lookup_player(playerId[0], season=year)
-    playerTwo = statsapi.lookup_player(opposingPlayerId[0], season=year)
-    stat_list = {}
+    playerOne = statsapi.lookup_player(playerId, season=year)
+    playerTwo = statsapi.lookup_player(opposingPlayerId, season=year)
+    stat_list = []
+    if playerOne == [] or playerTwo == []:
+        return('Invalid Player')
     stats = statsapi.get('people', {'personIds': playerOne[0]['id'], 'season': year, 'hydrate': f'stats(group=[hitting,pitching],type=[vsPlayer],opposingPlayerId={playerTwo[0]['id']},season={year})'})['people'][0]
     for i in range(0, 3):
         for j in range(0, len(stats['stats'][i]['splits'])):
-            if stats['stats'][i]['type']['displayName'] == 'vsPlayer' and stats['stats'][i]['splits'][j]['season']==year:
-                if stats['stats'][i]['group']['displayName']=='hitting':
-                    stat_list['player_name'] = (f"{playerOne[0]['fullFMLName']} vs {playerTwo[0]['fullFMLName']} Stats:")
-                    stat_list['avg'] = (f"  AVG: {stats['stats'][i]['splits'][0]['stat']['avg']}")
-                    stat_list['obp'] = (f"  OBP: {stats['stats'][i]['splits'][0]['stat']['obp']}")
-                    stat_list['slg'] = (f"  SLG: {stats['stats'][i]['splits'][0]['stat']['slg']}")
-                    stat_list['ops'] = (f"  OPS: {stats['stats'][i]['splits'][0]['stat']['ops']}")
-                    stat_list['doubles'] = (f"  Doubles: {stats['stats'][i]['splits'][0]['stat']['doubles']}")
-                    stat_list['triples'] = (f"  Triples: {stats['stats'][i]['splits'][0]['stat']['triples']}")
-                    stat_list['homeRuns'] = (f"  Home Runs: {stats['stats'][i]['splits'][0]['stat']['homeRuns']}")
-                    stat_list['rbi'] = (f"  RBI: {stats['stats'][i]['splits'][0]['stat']['rbi']}")
-                    stat_list['babip'] = (f"  BABIP: {stats['stats'][i]['splits'][0]['stat']['babip']}")
-                    stat_list['atBatsPerHomeRun'] = (f"  AB/HR: {stats['stats'][i]['splits'][0]['stat']['atBatsPerHomeRun']}")
-                    stat_list['groundIntoDoublePlay'] = (f"  GIDP: {stats['stats'][i]['splits'][0]['stat']['groundIntoDoublePlay']}")
-                    stat_list['plateAppearances'] = (f"  PA: {stats['stats'][i]['splits'][0]['stat']['plateAppearances']}")
-                    stat_list['baseOnBalls'] = (f"  Walks: {stats['stats'][i]['splits'][0]['stat']['baseOnBalls']}")
-                    return stat_list
-                elif stats['stats'][i]['group']['displayName']=='pitching':
-                    stat_list['player_name'] = (f"{playerOne[0]['fullFMLName']} vs {playerTwo[0]['fullFMLName']} Stats:")
-                    stat_list['rbi'] = (f"  Runs Allowed: {stats['stats'][i]['splits'][0]['stat']['rbi']}")
-                    stat_list['whip'] = (f"  WHIP: {stats['stats'][i]['splits'][0]['stat']['whip']}")
-                    stat_list['gamesPitched'] = (f"  Games Played: {stats['stats'][i]['splits'][0]['stat']['gamesPitched']}")
-                    stat_list['homeRuns'] = (f"  HR Allowed: {stats['stats'][i]['splits'][0]['stat']['homeRuns']}")
-                    stat_list['baseOnBalls'] = (f"  Walks: {stats['stats'][i]['splits'][0]['stat']['baseOnBalls']}")
-                    stat_list['hits'] = (f"  Hits: {stats['stats'][i]['splits'][0]['stat']['hits']}")
-                    stat_list['avg'] = (f"  AVG: {stats['stats'][i]['splits'][0]['stat']['avg']}")
-                    return stat_list
+            if stats['stats'][i]['type']['displayName'] == 'vsPlayer':
+                for k in range(0, len(stats['stats'][i]['splits'])):
+                    if stats['stats'][i]['splits'][k]['season']==str(year):
+                        if stats['stats'][i]['group']['displayName']=='hitting':
+                            stat_list.append(f"{playerOne[0]['fullFMLName']} vs {playerTwo[0]['fullFMLName']} Stats:")
+                            stat_list.append(f"  AVG: {stats['stats'][i]['splits'][0]['stat']['avg']}")
+                            stat_list.append(f"  OBP: {stats['stats'][i]['splits'][0]['stat']['obp']}")
+                            stat_list.append(f"  SLG: {stats['stats'][i]['splits'][0]['stat']['slg']}")
+                            stat_list.append(f"  OPS: {stats['stats'][i]['splits'][0]['stat']['ops']}")
+                            stat_list.append(f"  Doubles: {stats['stats'][i]['splits'][0]['stat']['doubles']}")
+                            stat_list.append(f"  Triples: {stats['stats'][i]['splits'][0]['stat']['triples']}")
+                            stat_list.append(f"  Home Runs: {stats['stats'][i]['splits'][0]['stat']['homeRuns']}")
+                            stat_list.append(f"  RBI: {stats['stats'][i]['splits'][0]['stat']['rbi']}")
+                            stat_list.append(f"  BABIP: {stats['stats'][i]['splits'][0]['stat']['babip']}")
+                            stat_list.append(f"  AB/HR: {stats['stats'][i]['splits'][0]['stat']['atBatsPerHomeRun']}")
+                            stat_list.append(f"  GIDP: {stats['stats'][i]['splits'][0]['stat']['groundIntoDoublePlay']}")
+                            stat_list.append(f"  PA: {stats['stats'][i]['splits'][0]['stat']['plateAppearances']}")
+                            stat_list.append(f"  Walks: {stats['stats'][i]['splits'][0]['stat']['baseOnBalls']}")
+                            return stat_list
+                        elif stats['stats'][i]['group']['displayName']=='pitching':
+                            stat_list.append(f"{playerOne[0]['fullFMLName']} vs {playerTwo[0]['fullFMLName']} Stats:")
+                            stat_list.append(f"  Runs Allowed: {stats['stats'][i]['splits'][0]['stat']['rbi']}")
+                            stat_list.append(f"  WHIP: {stats['stats'][i]['splits'][0]['stat']['whip']}")
+                            stat_list.append(f"  Games Played: {stats['stats'][i]['splits'][0]['stat']['gamesPitched']}")
+                            stat_list.append(f"  HR Allowed: {stats['stats'][i]['splits'][0]['stat']['homeRuns']}")
+                            stat_list.append(f"  Walks: {stats['stats'][i]['splits'][0]['stat']['baseOnBalls']}")
+                            stat_list.append(f"  Hits: {stats['stats'][i]['splits'][0]['stat']['hits']}")
+                            stat_list.append(f"  AVG: {stats['stats'][i]['splits'][0]['stat']['avg']}")
+                            return stat_list
 

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body>
+<div class="container">
+<a href="/" class="button">Go Home</a>
+<h1>Enter Team and Year:</h1>
+
+<form method="POST">
+  <label for="team">Team One:</label><br>
+  <input type="text" id="team" name="team"><br>
+  <label for="teamtwo">Team Two:</label><br>
+  <input type="texttwo" id="teamtwo" name="teamtwo"><br>
+  <label for="year">Year:</label><br>
+  <input type="text" id="year" name="year"><br>
+  <input type="submit" value="Submit">
+</form>
+
+<h1>Roster:</h1>
+<ul>
+{% for player in roster %}
+  <li>{{ player }}</li>
+{% endfor %}
+</ul>
+
+</div>
+</body>
+</html>

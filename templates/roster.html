@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+<body>
+<div class="w3-container">
+<a href="/" class="w3-button">Go Home</a>
+
+
+<form class="w3-container" method="POST">
+  <div class="w3-half">
+  <h2 class="w3-center" for="team">Team</label><br>
+  <input class="w3-input w3-block" type="text" id="team" name="team"><br>
+  </div>  
+  <div class="w3-half">
+  <h2 class="w3-center" for="year">Year</label><br>
+  <input class="w3-input w3-block" type="text" id="year" name="year"><br>
+  </div>  
+  <input class="w3-button w3-teal w3-block" type="submit" value="Submit">
+</form>
+
+{%if roster%}
+<h1 class="w3-center">Roster:</h1>
+{%endif%}
+<ul class="w3-ul w3-center">
+
+{% for player in roster %}
+  <li style="font-size:30px">{{ player }}</li>
+{% endfor %}
+
+</ul>
+
+</div>
+</body>
+</html>

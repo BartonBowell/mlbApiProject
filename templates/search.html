@@ -1,25 +1,43 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+  </head>
+  <body>
+    <div class="w3-container">
+      <a href="/" class="w3-button">Go Home</a>
+      <form class="w3-container" method="POST">
+        <div class="w3-half">
+          <h2 class="w3-center" for="player">Player</h2>
+          <br />
+          <input
+            class="w3-input w3-block"
+            type="text"
+            id="player"
+            name="player"
+          /><br />
+        </div>
+        <div class="w3-half">
+          <h2 class="w3-center" for="year">Year</h2>
+          <br />
+          <input
+            class="w3-input w3-block"
+            type="text"
+            id="year"
+            name="year"
+          /><br />
+        </div>
+        <input class="w3-button w3-teal w3-block" type="submit" value="Submit" />
+      </form>
 
-<body>
+      {% if search %}
+      <h1 class="w3-center">{{search[0][1]}} Stats:</h1>
 
-<h1>Enter player and Year:</h1>
-
-<form method="POST">
-  <label for="player">player:</label><br>
-  <input type="text" id="player" name="player"><br>
-  <label for="year">Year:</label><br>
-  <input type="text" id="year" name="year"><br>
-  <input type="submit" value="Submit">
-</form>
-
-<h1>Player Stats:</h1>
-
-<ul>
-{% for stat in search %}
-  <li>{{ stat }}</li>
-{% endfor %}
-</ul>
-
-</body>
+      <ul class="w3-ul w3-center">
+        {% for player in search[0][0] %}
+        <li>{{ player }}</li>
+        {% endfor %} {%endif%}
+      </ul>
+    </div>
+  </body>
 </html>

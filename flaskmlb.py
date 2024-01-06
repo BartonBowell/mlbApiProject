@@ -54,6 +54,22 @@ def get_box_score():
         box_score = []
     return render_template('boxscore.html', box_score=box_score)
 
+@app.route('/get_stat_leader', methods=['GET', 'POST'])
+def get_stat_leader():
+    if request.method == 'POST':
+        stat = request.form.get('stat')
+        year = request.form.get('year')
+        stat_leader = mlbProj.get_stat_leader(stat, year,type=['hitting','pitching'])
+        print('p')
+    else:
+        stat_leader = mlbProj.get_stat_leader('airOuts', '2023',type='hitting')
+    if len(stat_leader) >= 2:
+        return render_template('stat_leader.html', stat_leader=stat_leader[0], names=stat_leader[1])
+    else:
+        # Handle the case when stat_leader doesn't have enough elements
+        # You might want to return a different template or add an error message
+        return render_template('error.html', message="Not enough data to display.")
+
 @app.route('/gameid', methods=['GET', 'POST'])
 def game_id():
     game_id = ''

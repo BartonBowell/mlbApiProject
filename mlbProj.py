@@ -206,21 +206,18 @@ def get_stat_leader(category, year, type):
     Returns:
     None
     """
-    data = [{"assists":"assists"},{"shutouts":"shutouts"},{"homeruns":"homeRuns"},{"sacbunts":"sacrificeBunts"},{"sacfly":"sacrificeFlies"},{"runs":"runs"},{"stolenbases":"stolenBases"},{"avg":"battingAverage"},{"groundouts":"groundOuts"},{"pitchcount":"numberOfPitches"},{"obp":"onBasePercentage"},{"cs":"caughtStealing"},{"gidp":"groundIntoDoublePlays"},{"totalbases":"totalBases"},{"era":"earnedRunAverage"},{"f%":"fieldingPercentage"},{"whip":"walksAndHitsPerInningPitched"},{"flyouts":"flyouts"},{"hbp":"hitByPitches"},{"gamesplayed":"gamesPlayed"},{"walks":"walks"},{"slg":"sluggingPercentage"},{"ops":"onBasePlusSlugging"},{"rbi":"runsBattedIn"},{"triples":"triples"},{"xbh":"extraBaseHits"},{"hits":"hits"},{"ab":"atBats"},{"ks":"strikeouts"},{"doubles":"doubles"},{"pa":"totalPlateAppearances"},{"ibb":"intentionalWalks"},{"w":"wins"},{"l":"losses"},{"sv":"saves"},{"wildpitches":"wildPitch"},{"airouts":"airOuts"},{"balks":"balk"},{"blownsaves":"blownSaves"},{"cera":"catcherEarnedRunAverage"},{"catchersinterference":"catchersInterference"},{"chances":"chances"},{"cg":"completeGames"},{"doubleplays":"doublePlays"},{"er":"earnedRun"},{"errors":"errors"},{"gamesfinished":"gamesFinished"},{"gamesstarted":"gamesStarted"},{"battershit":"hitbatters"},{"h/9":"hitsPer9Inn"},{"holds":"holds"},{"innings":"innings"},{"ip":"inningsPitched"},{"outfieldassists":"outfieldAssists"},{"passedballs":"passedBalls"},{"pickoffs":"pickoffs"},{"p/9":"pitchesPerInning"},{"putouts":"putOuts"},{"rangefactorpergame":"rangeFactorPerGame"},{"rf/9":"rangeFactorPer9Inn"},{"saveopp":"saveOpportunities"},{"sb%":"stolenBasePercentage"},{"k/9":"strikeoutsPer9Inn"},{"k/bb":"strikeoutWalkRatio"},{"throwingerror":"throwingErrors"},{"battersfaced":"totalBattersFaced"},{"tripleplays":"triplePlays"},{"bb/9":"walksPer9Inn"},{"win%":"winPercentage"}]
-    data_dict = {list(d.keys())[0]: list(d.values())[0] for d in data}
-
-    if category not in data_dict:
-        print('Invalid Category')
+    if category == '' or year == '' or type == '':
+        return('Invalid Input')
     stat_leaders = []
     stat_leaders_name = []
     response = statsapi.get('stats_leaders', {
-        'leaderCategories': data_dict[str(category)],
+        'leaderCategories': category,
         'hydrate': type,
         'sportId': 1,
         'season': year,
-        'limit': 10
+        'limit': 25
     })
-    for i in range(0, 10): 
+    for i in range(0, 25): 
         inc = ("{:02d}".format(i))
         stat_leaders.append(response['leagueLeaders'][0]['leaders'][int(inc)]['value'])
         stat_leaders_name.append(response['leagueLeaders'][0]['leaders'][int(inc)]['person']['fullName'])
